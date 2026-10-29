@@ -1,66 +1,66 @@
-import { SymbolView } from 'expo-symbols';
-import { Link, Tabs } from 'expo-router';
-import { Platform, Pressable } from 'react-native';
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { Tabs } from "expo-router";
 
-import Colors from '@/constants/Colors';
-import { useColorScheme } from '@/components/useColorScheme';
-import { useClientOnlyValue } from '@/components/useClientOnlyValue';
+import { colors } from "@/app/styles";
+import Header from "@/components/Header";
+import {
+  NotificationsProvider,
+  useNotifications,
+} from "@/components/NotificationsContext";
+import { useClientOnlyValue } from "@/components/useClientOnlyValue";
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
+  return (
+    <NotificationsProvider>
+      <TabsNavigator />
+    </NotificationsProvider>
+  );
+}
+
+function TabsNavigator() {
+  const { count } = useNotifications();
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme].tint,
+        tabBarActiveTintColor: colors.primary,
         // Disable the static render of the header on web
         // to prevent a hydration error in React Navigation v6.
         headerShown: useClientOnlyValue(false, true),
-      }}>
+        header: ({ options, route }) => (
+          <Header title={options.title ?? route.name} />
+        ),
+      }}
+    >
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Tab One',
-          tabBarIcon: ({ color }) => (
-            <SymbolView
-              name={{
-                ios: 'chevron.left.forwardslash.chevron.right',
-                android: 'code',
-                web: 'code',
-              }}
-              tintColor={color}
-              size={28}
-            />
-          ),
-          headerRight: () => (
-            <Link href="/modal" asChild>
-              <Pressable style={{ marginRight: 15 }}>
-                {({ pressed }) => (
-                  <SymbolView
-                    name={{ ios: 'info.circle', android: 'info', web: 'info' }}
-                    size={25}
-                    tintColor={Colors[colorScheme].text}
-                    style={{ opacity: pressed ? 0.5 : 1 }}
-                  />
-                )}
-              </Pressable>
-            </Link>
+          title: "Início",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="home" size={size} color={color as string} />
           ),
         }}
       />
       <Tabs.Screen
-        name="two"
+        name="search"
         options={{
-          title: 'Tab Two',
-          tabBarIcon: ({ color }) => (
-            <SymbolView
-              name={{
-                ios: 'chevron.left.forwardslash.chevron.right',
-                android: 'code',
-                web: 'code',
-              }}
-              tintColor={color}
-              size={28}
+          title: "Busca",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="search" size={size} color={color as string} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="notifications"
+        options={{
+          title: "Notificações",
+          tabBarBadge: count > 0 ? count : undefined,
+          tabBarBadgeStyle: { backgroundColor: colors.badge, color: colors.white },
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons
+              name="notifications"
+              size={size}
+              color={color as string}
             />
           ),
         }}
